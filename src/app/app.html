@@ -1,0 +1,12 @@
+<nav *ngIf="isLoggedIn()" style="background: #ffffff; padding: 10px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+  <div style="font-weight: bold; font-size: 1.2em; color: #1877f2;">
+    Sosyal Medya
+  </div>
+  <div>
+    <a routerLink="/feed" style="margin-right: 15px; color: #555;">Ana Sayfa</a>
+    <a [routerLink]="['/profile', dataService.getCurrentUser()?.username]" style="margin-right: 15px; color: #555;">Profilim</a>
+    <button (click)="logout()" style="background: #e4e6eb; color: black; font-size: 0.9em;">Çıkış</button>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>

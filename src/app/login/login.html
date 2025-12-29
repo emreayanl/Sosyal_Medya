@@ -1,0 +1,17 @@
+<div class="login-container" style="text-align: center; margin-top: 50px;">
+  <h2>Giriş Yap</h2>
+
+  <div class="form-group">
+    <input type="text" placeholder="Kullanıcı Adı" [(ngModel)]="username">
+  </div>
+  <br>
+
+  <div class="form-group">
+    <input type="password" placeholder="Şifre" [(ngModel)]="password">
+  </div>
+  <br>
+
+  <button (click)="login()">Giriş Yap</button>
+
+  <p>Hesabın yok mu? <a href="/register">Kayıt Ol</a></p>
+</div>

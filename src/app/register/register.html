@@ -1,0 +1,22 @@
+<div class="register-container" style="text-align: center; margin-top: 50px;">
+  <h2>Kayıt Ol</h2>
+  
+  <div class="form-group">
+    <input type="text" placeholder="Kullanıcı Adı" [(ngModel)]="username">
+  </div>
+  <br>
+  
+  <div class="form-group">
+    <input type="email" placeholder="E-posta" [(ngModel)]="email">
+  </div>
+  <br>
+  
+  <div class="form-group">
+    <input type="password" placeholder="Şifre" [(ngModel)]="password">
+  </div>
+  <br>
+
+  <button (click)="register()">Kayıt Ol</button>
+  
+  <p>Zaten hesabın var mı? <a href="/login">Giriş Yap</a></p>
+</div>

@@ -1,0 +1,109 @@
+<div class="profile-container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+  
+  <a routerLink="/feed" style="display: inline-block; margin-bottom: 20px;">← Ana Sayfaya Dön</a>
+  
+  <div *ngIf="!profileUser" style="text-align: center; margin-top: 50px;">
+    <h2>Kullanıcı bulunamadı!</h2>
+  </div>
+
+  <div *ngIf="profileUser" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.2); text-align: center; margin-bottom: 20px;">
+    
+    <img 
+      [src]="profileUser.profilePhotoUrl || 'https://via.placeholder.com/150'" 
+      alt="Profil Resmi" 
+      style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #f0f2f5; margin-bottom: 10px;"
+    >
+    
+    <h1 style="margin: 0; font-size: 1.8em;">{{ profileUser.username }}</h1>
+    <p style="color: #65676b; margin-top: 5px;">{{ profileUser.bio || 'Henüz bir biyografi yok.' }}</p>
+
+    <div *ngIf="isOwnProfile()" style="margin-top: 15px;">
+      
+      <div *ngIf="!isEditing">
+        <button (click)="isEditing = true" class="btn-secondary" style="margin-right: 10px;">Profili Düzenle</button>
+        <button (click)="deleteAccount()" class="btn-danger">Hesabı Sil</button>
+      </div>
+
+      <div *ngIf="isEditing" style="background: #f0f2f5; padding: 15px; margin-top: 15px; border-radius: 8px; text-align: left;">
+        <label style="font-size: 0.9em; font-weight: bold; color: #65676b;">Profil Fotoğrafı URL:</label>
+        <input type="text" [(ngModel)]="editPhotoUrl" placeholder="https://..." style="margin-bottom: 10px;">
+        
+        <label style="font-size: 0.9em; font-weight: bold; color: #65676b;">Biyografi:</label>
+        <textarea [(ngModel)]="editBio" style="width: 100%; height: 60px; margin-bottom: 10px;"></textarea>
+        
+        <div style="text-align: right;">
+          <button (click)="isEditing = false" class="btn-secondary" style="margin-right: 5px;">İptal</button>
+          <button (click)="updateProfile()" class="btn-success">Değişiklikleri Kaydet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="profileUser">
+    <h3 style="color: #65676b; border-bottom: 1px solid #ccc; padding-bottom: 10px;">Paylaşımlar</h3>
+    
+    <div *ngFor="let post of userPosts" class="post-card">
+      
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+        <div class="post-header" style="font-weight: bold;">
+           @{{ post.authorUsername }}
+        </div>
+    
+        <div *ngIf="currentUser && post.authorUsername === currentUser.username">
+          <button (click)="startEditPost(post)" class="link-btn text-blue">Düzenle</button>
+          <button (click)="deletePost(post)" class="link-btn text-red">Sil</button>
+        </div>
+      </div>
+      
+      <div *ngIf="editingPostId !== post.id" class="post-content" style="margin-bottom: 15px; font-size: 1.1em; color: #1c1e21;">
+        {{ post.content }}
+      </div>
+    
+      <div *ngIf="editingPostId === post.id" style="margin-bottom: 15px;">
+        <textarea [(ngModel)]="editPostContent" style="width: 100%; height: 80px; margin-bottom: 5px;"></textarea>
+        <div style="text-align: right;">
+          <button (click)="editingPostId = null" class="btn-secondary" style="margin-right: 5px;">İptal</button>
+          <button (click)="saveEditPost(post)" class="btn-success">Kaydet</button>
+        </div>
+      </div>
+    
+      <div class="post-actions" style="border-top: 1px solid #e4e6eb; padding-top: 10px;">
+          <button (click)="likePost(post)" style="background: none; color: #65676b; padding: 5px;">
+            <span *ngIf="currentUser && post.likes.includes(currentUser.username)">❤️</span>
+            <span *ngIf="!currentUser || !post.likes.includes(currentUser.username)">🤍</span>
+            {{ post.likes.length }} Beğeni
+          </button>
+    
+          <hr style="margin: 10px 0; border: 0; border-top: 1px solid #e4e6eb;">
+    
+          <div class="comments-section" style="background-color: #f0f2f5; padding: 10px; border-radius: 8px;">
+            <div *ngFor="let comment of post.comments" class="comment-item">
+              <div *ngIf="editingCommentId !== comment.commentId" style="width: 100%; display: flex; justify-content: space-between;">
+                <span style="font-size: 0.9em;">
+                  <b style="color: #050505;">{{ comment.authorUsername }}:</b> {{ comment.content }}
+                </span>
+                <div *ngIf="currentUser && comment.authorUsername === currentUser.username" class="comment-actions">
+                  <span (click)="startEditComment(comment)" class="text-blue">Düzenle</span>
+                  <span (click)="deleteComment(post, comment.commentId)" class="text-red">Sil</span>
+                </div>
+              </div>
+              <div *ngIf="editingCommentId === comment.commentId" style="width: 100%; display: flex; gap: 5px;">
+                 <input type="text" [(ngModel)]="editCommentContent" style="flex: 1; padding: 5px;">
+                 <button (click)="saveEditComment(comment, post)" class="btn-success" style="padding: 2px 8px; font-size: 0.8em;">OK</button>
+                 <button (click)="editingCommentId = null" class="btn-secondary" style="padding: 2px 8px; font-size: 0.8em;">X</button>
+              </div>
+            </div>
+            <div style="display: flex; margin-top: 10px; gap: 5px;">
+              <input #commentInput type="text" placeholder="Bir yorum yaz..." style="flex: 1; border-radius: 20px; padding-left: 15px;">
+              <button (click)="addComment(post, commentInput.value); commentInput.value=''" style="border-radius: 20px;">Gönder</button>
+            </div>
+          </div>
+      </div>
+    </div>
+    
+    <div *ngIf="userPosts.length === 0" style="text-align: center; color: #65676b; padding: 20px;">
+      Bu kullanıcı henüz hiç post paylaşmamış.
+    </div>
+
+  </div>
+</div>
